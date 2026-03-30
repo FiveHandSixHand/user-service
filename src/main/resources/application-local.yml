@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    password: ${DB_PASSWORD}
+
+keycloak:
+  # Config Server의 ${KEYCLOAK_CLIENT_SECRET} 자리에 .env의 값을 넣어줍니다.
+  client-secret: ${KEYCLOAK_CLIENT_SECRET}
+
+# 로컬 실행 시에만 적용하고 싶은 추가 설정이 있다면 여기 적습니다.
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    com.yourproject.userservice: DEBUG
