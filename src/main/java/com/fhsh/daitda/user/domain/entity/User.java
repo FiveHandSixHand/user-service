@@ -19,19 +19,20 @@ public class User {
     @Column(name = "user_id", updatable = false, nullable = false)
     private UUID userId;
 
-    @Column(name = "email", length = 30, nullable = false, unique = true)
+    @Column(name = "email", length = 100, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "name", length = 10, nullable = false)
+    @Column(name = "name", length = 50, nullable = false)
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", length = 10, nullable = false)
+    @Column(name = "role", length = 20, nullable = false)
     private UserRole role;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", length = 10, nullable = false)
-    private UserStatus status;
+    @Column(name = "status", nullable = false, columnDefinition = "varchar(20) default 'PENDING'")
+    private UserStatus status = UserStatus.PENDING;
 
     @Column(name = "slack_user_id", length = 50)
     private String slackUserId;
