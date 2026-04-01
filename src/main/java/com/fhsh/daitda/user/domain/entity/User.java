@@ -29,10 +29,9 @@ public class User {
     @Column(name = "role", length = 20, nullable = false)
     private UserRole role;
 
-    @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, columnDefinition = "varchar(20) default 'PENDING'")
-    private UserStatus status = UserStatus.PENDING;
+    @Column(name = "status", length = 20, nullable = false)
+    private UserStatus status;
 
     @Column(name = "slack_user_id", length = 50)
     private String slackUserId;
