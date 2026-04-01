@@ -33,7 +33,6 @@ class UserTest {
     @Test
     @DisplayName("유저 승인 테스트")
     void approveUser() {
-        // given
         User user = User.create("test@test.com", "Test User", UserRole.MASTER, "SLACK_ID", null, null);
 
         user.approve();
@@ -52,17 +51,34 @@ class UserTest {
     }
 
     @Test
-    @DisplayName("유저 삭제 테스트 - UserStatus 동기화 확인")
+    @DisplayName("유저 삭제 테스트 - UserStatus 및 BaseUserEntity 필드 확인")
     void deleteUser() {
-        // given
         User user = User.create("test@test.com", "Test User", UserRole.MASTER, "SLACK_ID", null, null);
+        String deletedBy = "ADMIN_USER";
 
-        // when
-        user.delete("ADMIN");
+        user.delete(deletedBy);
 
-        // then
         assertThat(user.getStatus()).isEqualTo(UserStatus.DELETED);
         assertThat(user.isDeleted()).isTrue();
-        assertThat(user.getDeletedBy()).isEqualTo("ADMIN");
+        assertThat(user.getDeletedBy()).isEqualTo(deletedBy);
+        assertThat(user.getDeletedAt()).isNotNull();
+        assertThat(user.getUpdatedBy()).isEqualTo(deletedBy);
+    }
+
+    @Test
+    @DisplayName("유저 복구 테스트 - 삭제 상태에서 복구 확인")
+    void restoreUser() {
+        User user = User.create("test@test.com", "Test User", UserRole.MASTER, "SLACK_ID", null, null);
+        user.delete("ADMIN");
+        user.approve(); // 삭제된 상태에서도 비즈니스 상태는 바뀔 수 있지만, 복구를 테스트하기 위함
+
+        String restoredBy = "SUPER_ADMIN";
+
+        user.restore(restoredBy);
+
+        assertThat(user.isDeleted()).isFalse();
+        assertThat(user.getDeletedBy()).isNull();
+        assertThat(user.getDeletedAt()).isNull();
+        assertThat(user.getUpdatedBy()).isEqualTo(restoredBy);
     }
 }
