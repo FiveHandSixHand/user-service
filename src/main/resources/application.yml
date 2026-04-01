@@ -4,5 +4,11 @@ spring:
   profiles:
     # 기본 프로파일을 local로 설정하여, 아무 설정 없이 실행하면 local이 활성화됩니다.
     active: ${SPRING_PROFILES_ACTIVE:local}
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config-server
+
   config:
-    import: "optional:configserver:http://localhost:8888"
+    import: "configserver:"
