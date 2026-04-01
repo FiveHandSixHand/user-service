@@ -1,4 +1,4 @@
-package com.fhsh.user;
+package com.fhsh.daitda;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

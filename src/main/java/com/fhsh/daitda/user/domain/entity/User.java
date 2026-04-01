@@ -1,9 +1,9 @@
-package com.fhsh.user.domain.entity;
+package com.fhsh.daitda.user.domain.entity;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "users")
+@Table(name = "p_user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
