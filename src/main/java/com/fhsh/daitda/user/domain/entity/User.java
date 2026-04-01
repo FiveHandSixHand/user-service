@@ -1,5 +1,6 @@
 package com.fhsh.daitda.user.domain.entity;
 
+import com.fhsh.daitda.domain.BaseUserEntity;
 import com.fhsh.daitda.user.domain.enums.UserRole;
 import com.fhsh.daitda.user.domain.enums.UserStatus;
 import jakarta.persistence.*;
@@ -13,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class User {
+public class User extends BaseUserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "user_id", updatable = false, nullable = false)
@@ -48,5 +49,11 @@ public class User {
 
     public void reject() {
         this.status = UserStatus.REJECTED;
+    }
+
+    @Override
+    public void delete(String deletedBy) {
+        super.delete(deletedBy);
+        this.status = UserStatus.DELETED;
     }
 }
