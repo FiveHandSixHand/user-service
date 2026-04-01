@@ -12,8 +12,6 @@ import java.util.UUID;
 @Table(name = "p_user")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 public class User extends BaseUserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -34,7 +32,7 @@ public class User extends BaseUserEntity {
     @Column(name = "status", length = 20, nullable = false)
     private UserStatus status;
 
-    @Column(name = "slack_user_id", length = 50)
+    @Column(name = "slack_user_id", length = 50, nullable = false)
     private String slackUserId;
 
     @Column(name = "hub_id")
@@ -42,6 +40,35 @@ public class User extends BaseUserEntity {
 
     @Column(name = "company_id")
     private UUID companyId;
+
+    @Builder(access = AccessLevel.PRIVATE)
+    private User(String email, String name, UserRole role, String slackUserId, UUID hubId, UUID companyId) {
+        this.email = email;
+        this.name = name;
+        this.role = role;
+        this.slackUserId = slackUserId;
+        this.hubId = hubId;
+        this.companyId = companyId;
+        this.status = UserStatus.PENDING;
+    }
+
+    public static User create(
+            String email,
+            String name,
+            UserRole role,
+            String slackUserId,
+            UUID hubId,
+            UUID companyId
+    ) {
+        return User.builder()
+                .email(email)
+                .name(name)
+                .role(role)
+                .slackUserId(slackUserId)
+                .hubId(hubId)
+                .companyId(companyId)
+                .build();
+    }
 
     public void approve() {
         this.status = UserStatus.APPROVED;
