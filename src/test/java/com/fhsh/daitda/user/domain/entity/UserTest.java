@@ -70,7 +70,6 @@ class UserTest {
     void restoreUser() {
         User user = User.create("test@test.com", "Test User", UserRole.MASTER, "SLACK_ID", null, null);
         user.delete("ADMIN");
-        user.approve(); // 삭제된 상태에서도 비즈니스 상태는 바뀔 수 있지만, 복구를 테스트하기 위함
 
         String restoredBy = "SUPER_ADMIN";
 

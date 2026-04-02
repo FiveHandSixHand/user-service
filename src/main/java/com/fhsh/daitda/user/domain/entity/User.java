@@ -5,7 +5,9 @@ import com.fhsh.daitda.user.domain.enums.UserRole;
 import com.fhsh.daitda.user.domain.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -82,5 +84,11 @@ public class User extends BaseUserEntity {
     public void delete(String deletedBy) {
         super.delete(deletedBy);
         this.status = UserStatus.DELETED;
+    }
+
+    @Override
+    public void restore(String restoredBy) {
+        super.restore(restoredBy);
+        this.approve();
     }
 }
