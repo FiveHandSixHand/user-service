@@ -45,6 +45,9 @@ public class User extends BaseUserEntity {
 
     @Builder(access = AccessLevel.PRIVATE)
     private User(String email, String name, UserRole role, String slackUserId, UUID hubId, UUID companyId) {
+        validateEmail(email);
+        validateName(name);
+
         this.email = email;
         this.name = name;
         this.role = role;
@@ -90,5 +93,17 @@ public class User extends BaseUserEntity {
     public void restore(String restoredBy) {
         super.restore(restoredBy);
         this.approve();
+    }
+
+    private void validateEmail(String email) {
+        if (!StringUtils.hasText(email) || !email.contains("@")) {
+            throw new IllegalArgumentException("올바른 이메일 형식이 아닙니다.");
+        }
+    }
+
+    private void validateName(String name) {
+        if (!StringUtils.hasText(name) || name.length() < 2) {
+            throw new IllegalArgumentException("이름은 최소 2자 이상이어야 합니다.");
+        }
     }
 }
