@@ -1,8 +1,10 @@
 package com.fhsh.daitda.user.domain.entity;
 
 import com.fhsh.daitda.domain.BaseUserEntity;
+import com.fhsh.daitda.exception.BusinessException;
 import com.fhsh.daitda.user.domain.enums.UserRole;
 import com.fhsh.daitda.user.domain.enums.UserStatus;
+import com.fhsh.daitda.user.domain.exception.UserErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.util.StringUtils;
@@ -97,13 +99,13 @@ public class User extends BaseUserEntity {
 
     private void validateEmail(String email) {
         if (!StringUtils.hasText(email) || !email.contains("@")) {
-            throw new IllegalArgumentException("올바른 이메일 형식이 아닙니다.");
+            throw new BusinessException(UserErrorCode.INVALID_EMAIL_FORMAT);
         }
     }
 
     private void validateName(String name) {
         if (!StringUtils.hasText(name) || name.length() < 2) {
-            throw new IllegalArgumentException("이름은 최소 2자 이상이어야 합니다.");
+            throw new BusinessException(UserErrorCode.INVALID_USER_INPUT, "이름은 최소 2자 이상이어야 합니다.");
         }
     }
 }
