@@ -17,7 +17,6 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseUserEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "user_id", updatable = false, nullable = false)
     private UUID userId;
 
@@ -45,10 +44,11 @@ public class User extends BaseUserEntity {
     private UUID companyId;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private User(String email, String name, UserRole role, String slackUserId, UUID hubId, UUID companyId) {
+    private User(UUID userId, String email, String name, UserRole role, String slackUserId, UUID hubId, UUID companyId) {
         validateEmail(email);
         validateName(name);
 
+        this.userId = userId;
         this.email = email;
         this.name = name;
         this.role = role;
@@ -59,6 +59,7 @@ public class User extends BaseUserEntity {
     }
 
     public static User create(
+            UUID userId, // Keycloak에서 받은 UUID
             String email,
             String name,
             UserRole role,
@@ -67,6 +68,7 @@ public class User extends BaseUserEntity {
             UUID companyId
     ) {
         return User.builder()
+                .userId(userId)
                 .email(email)
                 .name(name)
                 .role(role)
