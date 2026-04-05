@@ -1,4 +1,4 @@
-package com.fhsh.daitda.user.domain.service;
+package com.fhsh.daitda.user.application.port;
 
 import com.fhsh.daitda.user.domain.enums.UserRole;
 import java.util.UUID;
