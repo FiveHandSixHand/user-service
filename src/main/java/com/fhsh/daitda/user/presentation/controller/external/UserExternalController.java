@@ -21,7 +21,7 @@ public class UserExternalController {
     private final UserCommandService userCommandService;
 
     @PostMapping("/signup")
-    public CommonResponse<UUID> signup(@Valid @RequestBody UserSignupRequest request) {
+    public CommonResponse<Void> signup(@Valid @RequestBody UserSignupRequest request) {
         SignupCommand command = new SignupCommand(
                 request.email(),
                 request.password(),
@@ -32,6 +32,6 @@ public class UserExternalController {
                 request.companyId()
         );
 
-        return CommonResponse.success(userCommandService.signup(command));
+        return CommonResponse.success();
     }
 }
