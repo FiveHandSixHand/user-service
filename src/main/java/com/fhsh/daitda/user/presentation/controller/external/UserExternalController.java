@@ -37,7 +37,7 @@ public class UserExternalController {
         return CommonResponse.success();
     }
 
-    @HasRole("ADMIN")
+    @HasRole({"ADMIN", "HUB_ADMIN"})
     @PostMapping("/{userId}/registration")
     public CommonResponse<Void> registration(
             @PathVariable("userId") UUID userId,
