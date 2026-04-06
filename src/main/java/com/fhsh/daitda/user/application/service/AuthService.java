@@ -40,13 +40,24 @@ public class AuthService {
     }
 
     public void logout(UUID userId, String authHeader) {
-        // 1. Refresh Token 삭제
-        tokenPort.deleteRefreshToken(userId);
-
-        // 2. Access Token 블랙리스트 추가 요청
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            tokenPort.addToBlacklist(authHeader.substring(7));
+        // Access Token에서 실제 사용자 ID 추출 및 검증
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
         }
+
+        String accessToken = authHeader.substring(7);
+        UUID tokenId = tokenPort.getUserIdFromToken(accessToken);
+
+        // 토큰의 sub(사용자ID)와 요청된 userId가 일치하는지 확인 (ID 변조 방지)
+        if (tokenId == null || !tokenId.equals(userId)) {
+            throw new BusinessException(AuthErrorCode.INSUFFICIENT_PERMISSION);
+        }
+
+        // Refresh Token 삭제 (토큰에 기록된 실제 소유자의 ID 사용)
+        tokenPort.deleteRefreshToken(tokenId);
+
+        // Access Token 블랙리스트 추가
+        tokenPort.addToBlacklist(accessToken);
     }
 
     public AuthTokens reissue(String refreshToken) {
