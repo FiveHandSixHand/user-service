@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisTokenAdapter implements TokenPort {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
     private static final String BLACKLIST_PREFIX = "blacklist:";
 
@@ -31,8 +31,7 @@ public class RedisTokenAdapter implements TokenPort {
     @Override
     public String getRefreshToken(UUID userId) {
         String key = REFRESH_TOKEN_PREFIX + userId.toString();
-        Object value = redisTemplate.opsForValue().get(key);
-        return value != null ? value.toString() : null;
+        return redisTemplate.opsForValue().get(key);
     }
 
     @Override
