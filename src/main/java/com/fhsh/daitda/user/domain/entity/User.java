@@ -102,6 +102,22 @@ public class User extends BaseUserEntity {
         this.approve();
     }
 
+    public void update(String name, String slackUserId, UUID hubId, UUID companyId) {
+        if (name != null) {
+            validateName(name);
+            this.name = name;
+        }
+        if (slackUserId != null) {
+            this.slackUserId = slackUserId;
+        }
+        if (hubId != null) {
+            this.hubId = hubId;
+        }
+        if (companyId != null) {
+            this.companyId = companyId;
+        }
+    }
+
     private void validateEmail(String email) {
         if (!StringUtils.hasText(email) || !email.contains("@")) {
             throw new BusinessException(UserErrorCode.INVALID_EMAIL_FORMAT);
