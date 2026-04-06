@@ -5,6 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -36,13 +40,23 @@ public class RedisTokenAdapter implements TokenPort {
 
     @Override
     public void addToBlacklist(String accessToken, long duration, TimeUnit unit) {
-        String key = BLACKLIST_PREFIX + accessToken;
-        redisTemplate.opsForValue().set(key, "blacklisted", duration, unit);
+        String key = BLACKLIST_PREFIX + sha256(accessToken);
+        redisTemplate.opsForValue().set(key, "black", duration, unit);
     }
 
     @Override
     public boolean isBlacklisted(String accessToken) {
-        String key = BLACKLIST_PREFIX + accessToken;
+        String key = BLACKLIST_PREFIX + sha256(accessToken);
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+    }
+
+    private String sha256(String token) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] digest = md.digest(token.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(digest);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
     }
 }
