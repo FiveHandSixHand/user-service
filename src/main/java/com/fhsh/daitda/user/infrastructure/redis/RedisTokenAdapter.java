@@ -57,6 +57,20 @@ public class RedisTokenAdapter implements TokenPort {
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 
+    @Override
+    public UUID getUserIdFromToken(String token) {
+        try {
+            String[] chunks = token.split("\\.");
+            if (chunks.length < 2) return null;
+            String payload = new String(Base64.getUrlDecoder().decode(chunks[1]));
+            JsonNode node = objectMapper.readTree(payload);
+            String sub = node.get("sub").asText();
+            return UUID.fromString(sub);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private long getRemainingTtlFromToken(String token) {
         try {
             String[] chunks = token.split("\\.");
