@@ -1,5 +1,6 @@
 package com.fhsh.daitda.user.application.port;
 
+import com.fhsh.daitda.user.application.result.LoginResult;
 import com.fhsh.daitda.user.domain.enums.UserRole;
 import java.util.UUID;
 
@@ -16,4 +17,6 @@ public interface AccountProvider {
      * keycloak의 계정을 삭제합니다.
      */
     void deleteAccount(UUID accountId);
+
+    LoginResult authenticate(String email, String password);
 }

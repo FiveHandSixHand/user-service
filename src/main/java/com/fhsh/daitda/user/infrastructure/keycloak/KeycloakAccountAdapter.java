@@ -1,15 +1,19 @@
 package com.fhsh.daitda.user.infrastructure.keycloak;
 
 import com.fhsh.daitda.exception.BusinessException;
+import com.fhsh.daitda.user.application.result.LoginResult;
 import com.fhsh.daitda.user.domain.exception.AuthErrorCode;
 import com.fhsh.daitda.user.domain.enums.UserRole;
 import com.fhsh.daitda.user.application.port.AccountProvider;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
+import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -25,8 +29,14 @@ public class KeycloakAccountAdapter implements AccountProvider {
 
     private final Keycloak keycloak;
 
+    @Value("${keycloak.server-url}")
+    private String serverUrl;
+
     @Value("${keycloak.realm}")
     private String realm;
+
+    @Value("${keycloak.user.client-id}")
+    private String userClientId;
 
     @Override
     public UUID createAccount(String email, String password, String name, UserRole role) {
@@ -36,6 +46,7 @@ public class KeycloakAccountAdapter implements AccountProvider {
         user.setUsername(email);
         user.setEmail(email);
         user.setFirstName(name);
+        user.setLastName(name);
         user.setEnabled(false);
         user.setEmailVerified(true);
 
@@ -99,6 +110,24 @@ public class KeycloakAccountAdapter implements AccountProvider {
         }
         catch (Exception e) {
             throw new BusinessException(AuthErrorCode.AUTH_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public LoginResult authenticate(String email, String password) {
+        try (Keycloak userKeycloak = KeycloakBuilder.builder()
+                .serverUrl(serverUrl)
+                .realm(realm)
+                .grantType(OAuth2Constants.PASSWORD)
+                .clientId(userClientId)
+                .username(email)
+                .password(password)
+                .build()
+        ) {
+            AccessTokenResponse response = userKeycloak.tokenManager().getAccessToken();
+            return new LoginResult(response.getToken(), response.getRefreshToken());
+        } catch (Exception e) {
+            throw new BusinessException(AuthErrorCode.INVALID_CREDENTIALS);
         }
     }
 }

@@ -3,7 +3,7 @@ package com.fhsh.daitda.user.application.command;
 import com.fhsh.daitda.user.domain.enums.UserRole;
 import java.util.UUID;
 
-public record UserSignupCommand(
+public record SignupCommand(
         String email,
         String password,
         String name,
