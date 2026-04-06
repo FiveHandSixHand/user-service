@@ -1,6 +1,6 @@
 package com.fhsh.daitda.user.application.service.command;
 
-import com.fhsh.daitda.user.application.command.UserSignupCommand;
+import com.fhsh.daitda.user.application.command.SignupCommand;
 import com.fhsh.daitda.user.domain.entity.User;
 import com.fhsh.daitda.user.domain.repository.UserRepository;
 import com.fhsh.daitda.user.application.port.AccountProvider;
@@ -18,7 +18,7 @@ public class UserCommandService {
     private final UserRepository userRepository;
 
     @Transactional
-    public UUID signup(UserSignupCommand command) {
+    public UUID signup(SignupCommand command) {
         // Keycloak 계정 생성 (DB 트랜잭션과 무관한 외부 통신)
         UUID keycloakId = accountProvider.createAccount(
                 command.email(),
