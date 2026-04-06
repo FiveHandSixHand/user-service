@@ -1,7 +1,7 @@
 package com.fhsh.daitda.user.presentation.controller.external;
 
 import com.fhsh.daitda.response.CommonResponse;
-import com.fhsh.daitda.user.application.command.UserSignupCommand;
+import com.fhsh.daitda.user.application.command.SignupCommand;
 import com.fhsh.daitda.user.application.service.command.UserCommandService;
 import com.fhsh.daitda.user.presentation.dto.request.UserSignupRequest;
 import jakarta.validation.Valid;
@@ -22,7 +22,7 @@ public class UserExternalController {
 
     @PostMapping("/signup")
     public CommonResponse<UUID> signup(@Valid @RequestBody UserSignupRequest request) {
-        UserSignupCommand command = new UserSignupCommand(
+        SignupCommand command = new SignupCommand(
                 request.email(),
                 request.password(),
                 request.name(),
