@@ -8,6 +8,5 @@ public interface TokenPort {
     void deleteRefreshToken(UUID userId);
     String getRefreshToken(UUID userId);
     void addToBlacklist(String accessToken);
-    boolean isBlacklisted(String accessToken);
     UUID getUserIdFromToken(String token);
 }

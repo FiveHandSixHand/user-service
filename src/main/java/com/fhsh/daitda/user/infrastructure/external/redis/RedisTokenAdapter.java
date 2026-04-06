@@ -52,12 +52,6 @@ public class RedisTokenAdapter implements TokenPort {
     }
 
     @Override
-    public boolean isBlacklisted(String accessToken) {
-        String key = BLACKLIST_PREFIX + sha256(accessToken);
-        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
-    }
-
-    @Override
     public UUID getUserIdFromToken(String token) {
         try {
             String[] chunks = token.split("\\.");
