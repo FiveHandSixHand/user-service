@@ -1,4 +1,4 @@
-package com.fhsh.daitda.user.infrastructure.redis;
+package com.fhsh.daitda.user.infrastructure.external.redis;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

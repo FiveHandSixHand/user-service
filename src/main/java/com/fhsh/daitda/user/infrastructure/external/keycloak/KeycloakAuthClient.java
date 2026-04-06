@@ -1,4 +1,4 @@
-package com.fhsh.daitda.user.infrastructure.keycloak;
+package com.fhsh.daitda.user.infrastructure.external.keycloak;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;

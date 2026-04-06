@@ -1,4 +1,4 @@
-package com.fhsh.daitda.user.infrastructure.keycloak;
+package com.fhsh.daitda.user.infrastructure.external.keycloak;
 
 import com.fhsh.daitda.exception.BusinessException;
 import com.fhsh.daitda.user.application.port.AccountPort;
