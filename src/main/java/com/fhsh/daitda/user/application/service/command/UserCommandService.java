@@ -1,6 +1,7 @@
 package com.fhsh.daitda.user.application.service.command;
 import com.fhsh.daitda.exception.BusinessException;
 import com.fhsh.daitda.user.application.command.SignupCommand;
+import com.fhsh.daitda.user.application.command.UserUpdateCommand;
 import com.fhsh.daitda.user.domain.entity.User;
 import com.fhsh.daitda.user.domain.enums.UserRole;
 import com.fhsh.daitda.user.domain.enums.UserStatus;
@@ -8,6 +9,7 @@ import com.fhsh.daitda.user.domain.exception.AuthErrorCode;
 import com.fhsh.daitda.user.domain.exception.UserErrorCode;
 import com.fhsh.daitda.user.domain.repository.UserRepository;
 import com.fhsh.daitda.user.application.port.AccountPort;
+import com.fhsh.daitda.user.presentation.dto.response.UserUpdateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,5 +94,25 @@ public class UserCommandService {
 
         // Keycloak 계정 삭제
         accountPort.deleteAccount(targetUserId);
+    }
+
+    @Transactional
+    public UserUpdateResponse updateUser(UserUpdateCommand command) {
+        User user = userRepository.findById(command.userId())
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        // TODO: hubId, companyId가 실제 존재하는 값인지 확인해야함
+
+        user.update(command.name(), command.slackUserId(), command.hubId(), command.companyId());
+        User updatedUser = userRepository.save(user);
+
+        return new UserUpdateResponse(
+                updatedUser.getUserId(),
+                updatedUser.getName(),
+                updatedUser.getSlackUserId(),
+                updatedUser.getHubId(),
+                updatedUser.getCompanyId(),
+                updatedUser.getUpdatedAt()
+        );
     }
 }
