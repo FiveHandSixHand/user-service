@@ -1,5 +1,6 @@
 package com.fhsh.daitda.user.config;
 
+import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +30,7 @@ public class KeycloakConfig {
         return KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
                 .realm(realm) // 보통 관리를 위해 master realm을 사용하거나 지정된 realm을 사용
-                .grantType(adminPassword)
+                .grantType(OAuth2Constants.PASSWORD)
                 .clientId(adminClientId)
                 .username(adminUsername)
                 .password(adminPassword)
