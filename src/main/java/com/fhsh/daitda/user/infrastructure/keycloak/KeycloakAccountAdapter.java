@@ -1,10 +1,10 @@
 package com.fhsh.daitda.user.infrastructure.keycloak;
 
 import com.fhsh.daitda.exception.BusinessException;
+import com.fhsh.daitda.user.application.port.AccountPort;
 import com.fhsh.daitda.user.application.result.LoginResult;
 import com.fhsh.daitda.user.domain.exception.AuthErrorCode;
 import com.fhsh.daitda.user.domain.enums.UserRole;
-import com.fhsh.daitda.user.application.port.AccountProvider;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.OAuth2Constants;
@@ -21,13 +21,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class KeycloakAccountAdapter implements AccountProvider {
+public class KeycloakAccountAdapter implements AccountPort {
 
     private final Keycloak keycloak;
+    private final KeycloakAuthClient authClient;
 
     @Value("${keycloak.server-url}")
     private String serverUrl;
@@ -128,6 +131,21 @@ public class KeycloakAccountAdapter implements AccountProvider {
             return new LoginResult(response.getToken(), response.getRefreshToken());
         } catch (Exception e) {
             throw new BusinessException(AuthErrorCode.INVALID_CREDENTIALS);
+        }
+    }
+
+    @Override
+    public LoginResult refresh(String refreshToken) {
+        try {
+            Map<String, String> params = new HashMap<>();
+            params.put("grant_type", "refresh_token");
+            params.put("client_id", userClientId);
+            params.put("refresh_token", refreshToken);
+
+            AccessTokenResponse response = authClient.refresh(params);
+            return new LoginResult(response.getToken(), response.getRefreshToken());
+        } catch (Exception e) {
+            throw new BusinessException(AuthErrorCode.TOKEN_EXPIRED);
         }
     }
 }
