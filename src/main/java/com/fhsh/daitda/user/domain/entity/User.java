@@ -56,6 +56,10 @@ public class User extends BaseUserEntity {
         this.hubId = hubId;
         this.companyId = companyId;
         this.status = UserStatus.PENDING;
+
+        // 회원가입 시에는 인증 정보가 없으므로 본인의 ID를 생성자/수정자로 기록
+        this.createdBy = userId;
+        this.updatedBy = userId;
     }
 
     public static User create(
