@@ -1,6 +1,7 @@
 package com.fhsh.daitda.user.application.service.command;
 import com.fhsh.daitda.exception.BusinessException;
 import com.fhsh.daitda.user.application.command.SignupCommand;
+import com.fhsh.daitda.user.application.command.UserRoleUpdateCommand;
 import com.fhsh.daitda.user.application.command.UserUpdateCommand;
 import com.fhsh.daitda.user.domain.entity.User;
 import com.fhsh.daitda.user.domain.enums.UserStatus;
@@ -114,5 +115,18 @@ public class UserCommandService {
                 updatedUser.getCompanyId(),
                 updatedUser.getUpdatedAt()
         );
+    }
+
+    @Transactional
+    public void updateUserRole(UserRoleUpdateCommand command) {
+        User user = userRepository.findById(command.userId())
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        // Keycloak 권한 변경
+        accountPort.updateAccountRole(user.getUserId(), command.role());
+
+        // 로컬 DB 권한 변경
+        user.updateRole(command.role());
+        userRepository.save(user);
     }
 }

@@ -3,9 +3,11 @@ package com.fhsh.daitda.user.presentation.controller.external;
 import com.fhsh.daitda.common.annotation.HasRole;
 import com.fhsh.daitda.response.CommonResponse;
 import com.fhsh.daitda.user.application.command.SignupCommand;
+import com.fhsh.daitda.user.application.command.UserRoleUpdateCommand;
 import com.fhsh.daitda.user.application.command.UserUpdateCommand;
 import com.fhsh.daitda.user.application.service.command.UserCommandService;
 import com.fhsh.daitda.user.presentation.dto.request.UserRegistrationRequest;
+import com.fhsh.daitda.user.presentation.dto.request.UserRoleUpdateRequest;
 import com.fhsh.daitda.user.presentation.dto.request.UserSignupRequest;
 import com.fhsh.daitda.user.presentation.dto.request.UserUpdateRequest;
 import com.fhsh.daitda.user.presentation.dto.response.UserUpdateResponse;
@@ -71,5 +73,15 @@ public class UserExternalController {
                 request.companyId()
         ));
         return CommonResponse.success("사용자 정보 수정 성공", response);
+    }
+
+    @HasRole("ADMIN")
+    @PatchMapping("/{userId}/role")
+    public CommonResponse<Void> updateUserRole(
+            @PathVariable("userId") UUID userId,
+            @Valid @RequestBody UserRoleUpdateRequest request
+    ) {
+        userCommandService.updateUserRole(new UserRoleUpdateCommand(userId, request.role()));
+        return CommonResponse.success("사용자 권한 변경 성공", null);
     }
 }
