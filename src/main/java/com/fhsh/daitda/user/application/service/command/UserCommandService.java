@@ -73,4 +73,24 @@ public class UserCommandService {
 
         userRepository.save(user);
     }
+
+
+    @Transactional
+    public void deleteUser(UUID targetUserId, UUID deletedBy) {
+        // 1. 대상 사용자 조회
+        User user = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        // 이미 삭제된 상태인지 확인
+        if (user.getStatus() == UserStatus.DELETED) {
+            throw new BusinessException(UserErrorCode.ALREADY_DELETED);
+        }
+
+        // DB Soft Delete 수행
+        user.delete(deletedBy);
+        userRepository.save(user);
+
+        // Keycloak 계정 삭제
+        accountPort.deleteAccount(targetUserId);
+    }
 }

@@ -43,4 +43,14 @@ public class UserExternalController {
         userCommandService.registration(userId, request.isApproved());
         return CommonResponse.success();
     }
+
+    @HasRole("ADMIN")
+    @DeleteMapping("/{userId}")
+    public CommonResponse<Void> deleteUser(
+            @PathVariable("userId") UUID userId,
+            @RequestHeader("X-User-Id") UUID requesterId
+    ) {
+        userCommandService.deleteUser(userId, requesterId);
+        return CommonResponse.success();
+    }
 }
