@@ -12,4 +12,16 @@ public record UserSignupCommand(
         UUID hubId,
         UUID companyId
 ) {
+    @Override
+    public String toString() {
+        return "UserSignupCommand[" +
+                "email='" + email + '\'' +
+                ", password='****'" + // 비밀번호 마스킹 처리
+                ", name='" + name + '\'' +
+                ", role=" + role +
+                ", slackUserId='" + slackUserId + '\'' +
+                ", hubId=" + hubId +
+                ", companyId=" + companyId +
+                ']';
+    }
 }
