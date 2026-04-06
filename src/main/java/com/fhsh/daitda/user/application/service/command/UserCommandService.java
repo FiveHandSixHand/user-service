@@ -3,9 +3,7 @@ import com.fhsh.daitda.exception.BusinessException;
 import com.fhsh.daitda.user.application.command.SignupCommand;
 import com.fhsh.daitda.user.application.command.UserUpdateCommand;
 import com.fhsh.daitda.user.domain.entity.User;
-import com.fhsh.daitda.user.domain.enums.UserRole;
 import com.fhsh.daitda.user.domain.enums.UserStatus;
-import com.fhsh.daitda.user.domain.exception.AuthErrorCode;
 import com.fhsh.daitda.user.domain.exception.UserErrorCode;
 import com.fhsh.daitda.user.domain.repository.UserRepository;
 import com.fhsh.daitda.user.application.port.AccountPort;
@@ -101,7 +99,9 @@ public class UserCommandService {
         User user = userRepository.findById(command.userId())
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        // TODO: hubId, companyId가 실제 존재하는 값인지 확인해야함
+        if (user.getStatus() == UserStatus.DELETED) {
+            throw new BusinessException(UserErrorCode.ALREADY_DELETED);
+        }
 
         user.update(command.name(), command.slackUserId(), command.hubId(), command.companyId());
         User updatedUser = userRepository.save(user);
