@@ -38,13 +38,14 @@ ext {
 }
 
 dependencies {
-    implementation 'com.fhsh.daitda:common:0.1.2-SNAPSHOT'
+    implementation 'com.fhsh.daitda:common:0.1.4-SNAPSHOT'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'org.keycloak:keycloak-admin-client:26.0.0'
     runtimeOnly 'org.postgresql:postgresql'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

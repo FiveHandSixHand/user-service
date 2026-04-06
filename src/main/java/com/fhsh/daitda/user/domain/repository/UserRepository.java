@@ -7,4 +7,5 @@ import java.util.UUID;
 public interface UserRepository {
     Optional<User> findById(UUID userId);
     User save(User user);
+    User saveAndFlush(User user);
 }

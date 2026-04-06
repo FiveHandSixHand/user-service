@@ -87,13 +87,13 @@ public class User extends BaseUserEntity {
     }
 
     @Override
-    public void delete(String deletedBy) {
+    public void delete(UUID deletedBy) {
         super.delete(deletedBy);
         this.status = UserStatus.DELETED;
     }
 
     @Override
-    public void restore(String restoredBy) {
+    public void restore(UUID restoredBy) {
         super.restore(restoredBy);
         this.approve();
     }

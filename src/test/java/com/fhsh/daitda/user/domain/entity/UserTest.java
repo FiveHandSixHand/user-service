@@ -58,15 +58,14 @@ class UserTest {
     void deleteUser() {
         UUID userId = UUID.randomUUID();
         User user = User.create(userId,"test@test.com", "Test User", UserRole.MASTER, "SLACK_ID", null, null);
-        String deletedBy = "ADMIN_USER";
 
-        user.delete(deletedBy);
+        user.delete(userId);
 
         assertThat(user.getStatus()).isEqualTo(UserStatus.DELETED);
         assertThat(user.isDeleted()).isTrue();
-        assertThat(user.getDeletedBy()).isEqualTo(deletedBy);
+        assertThat(user.getDeletedBy()).isEqualTo(userId);
         assertThat(user.getDeletedAt()).isNotNull();
-        assertThat(user.getUpdatedBy()).isEqualTo(deletedBy);
+        assertThat(user.getUpdatedBy()).isEqualTo(userId);
     }
 
     @Test
@@ -74,15 +73,13 @@ class UserTest {
     void restoreUser() {
         UUID userId = UUID.randomUUID();
         User user = User.create(userId,"test@test.com", "Test User", UserRole.MASTER, "SLACK_ID", null, null);
-        user.delete("ADMIN");
+        user.delete(userId);
 
-        String restoredBy = "SUPER_ADMIN";
-
-        user.restore(restoredBy);
+        user.restore(userId);
 
         assertThat(user.isDeleted()).isFalse();
         assertThat(user.getDeletedBy()).isNull();
         assertThat(user.getDeletedAt()).isNull();
-        assertThat(user.getUpdatedBy()).isEqualTo(restoredBy);
+        assertThat(user.getUpdatedBy()).isEqualTo(userId);
     }
 }
