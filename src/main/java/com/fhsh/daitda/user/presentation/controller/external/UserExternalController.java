@@ -4,6 +4,7 @@ import com.fhsh.daitda.response.CommonResponse;
 import com.fhsh.daitda.user.application.command.UserSignupCommand;
 import com.fhsh.daitda.user.application.service.command.UserCommandService;
 import com.fhsh.daitda.user.presentation.dto.request.UserSignupRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ public class UserExternalController {
     private final UserCommandService userCommandService;
 
     @PostMapping("/signup")
-    public CommonResponse<UUID> signup(@RequestBody UserSignupRequest request) {
+    public CommonResponse<UUID> signup(@Valid @RequestBody UserSignupRequest request) {
         UserSignupCommand command = new UserSignupCommand(
                 request.email(),
                 request.password(),

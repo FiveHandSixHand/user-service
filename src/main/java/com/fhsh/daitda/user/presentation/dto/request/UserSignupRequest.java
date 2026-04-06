@@ -1,14 +1,18 @@
 package com.fhsh.daitda.user.presentation.dto.request;
 
 import com.fhsh.daitda.user.domain.enums.UserRole;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.UUID;
 
 public record UserSignupRequest(
-        String email,
-        String password,
-        String name,
-        UserRole role,
-        String slackUserId,
+        @Email @NotNull String email,
+        @NotNull String password,
+        @NotNull String name,
+        @NotNull UserRole role,
+        @NotNull String slackUserId,
         UUID hubId,
         UUID companyId
 ) {
