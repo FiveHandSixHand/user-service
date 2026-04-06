@@ -5,7 +5,6 @@ import com.fhsh.daitda.user.domain.entity.User;
 import com.fhsh.daitda.user.domain.repository.UserRepository;
 import com.fhsh.daitda.user.application.port.AccountProvider;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

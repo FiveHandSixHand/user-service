@@ -36,7 +36,7 @@ public class KeycloakAccountAdapter implements AccountProvider {
         user.setUsername(email);
         user.setEmail(email);
         user.setFirstName(name);
-        user.setEnabled(true);
+        user.setEnabled(false);
         user.setEmailVerified(true);
 
         // 비밀번호 설정
