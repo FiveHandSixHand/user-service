@@ -31,9 +31,7 @@ public class UserExternalController {
                 request.hubId(),
                 request.companyId()
         );
-
-
-
+        userCommandService.signup(command);
         return CommonResponse.success();
     }
 }
