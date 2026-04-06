@@ -48,26 +48,33 @@ public class KeycloakAccountAdapter implements AccountProvider {
 
         // Keycloak에 사용자 생성 요청
         UsersResource usersResource = keycloak.realm(realm).users();
-        try (Response response = usersResource.create(user)) { // 자동 close 보장
 
+        String createdId = null;
+
+        try (Response response = usersResource.create(user)) {
             if (response.getStatus() != 201) {
-                if (response.getStatus() == 409) {
-                    throw new BusinessException(AuthErrorCode.AUTH_USER_ALREADY_EXISTS);
-                }
-
+                if (response.getStatus() == 409) throw new BusinessException(AuthErrorCode.AUTH_USER_ALREADY_EXISTS);
                 throw new BusinessException(AuthErrorCode.AUTH_SERVER_ERROR);
             }
-
-            String userId = CreatedResponseUtil.getCreatedId(response);
-            assignRoleToUser(userId, role.name());
-
-            return UUID.fromString(userId);
-
+            // 생성된 ID 저장
+            createdId = CreatedResponseUtil.getCreatedId(response);
         } catch (BusinessException e) {
-            throw e; // 이미 정의된 비즈니스 예외는 그대로 전파
+            throw e;
         } catch (Exception e) {
             throw new BusinessException(AuthErrorCode.AUTH_SERVER_UNAVAILABLE);
         }
+
+        // 권한(Role) 부여 시도
+        try {
+            assignRoleToUser(createdId, role.name());
+        } catch (Exception e) {
+            if (createdId != null) {
+                deleteAccount(UUID.fromString(createdId));
+            }
+            throw new BusinessException(AuthErrorCode.AUTH_SERVER_ERROR);
+        }
+
+        return UUID.fromString(createdId);
     }
 
     private void assignRoleToUser(String userId, String roleName) {
