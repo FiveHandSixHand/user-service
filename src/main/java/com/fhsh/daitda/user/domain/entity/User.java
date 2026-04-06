@@ -118,6 +118,13 @@ public class User extends BaseUserEntity {
         }
     }
 
+    public void updateRole(UserRole role) {
+        if (role == null) {
+            throw new BusinessException(UserErrorCode.INVALID_USER_INPUT, "권한은 필수 입력 값입니다.");
+        }
+        this.role = role;
+    }
+
     private void validateEmail(String email) {
         if (!StringUtils.hasText(email) || !email.contains("@")) {
             throw new BusinessException(UserErrorCode.INVALID_EMAIL_FORMAT);
