@@ -40,8 +40,13 @@ public class UserCommandService {
                     command.companyId()
             );
 
-            // DB 저장
-            return userRepository.save(user).getUserId();
+            // saveAndFlush()로 즉시 DB 반영 강제 해야함
+            // @Transactional에서 userRepository.save(user)는 영속성 컨텍스트에만 저장하고,
+            // 실제 flush와 커밋은 메서드 반환 후에 발생
+            // try-catch 블록은 persist 단계까지만 보호하며,
+            // 커밋 시 제약조건 위반이나 flush 실패가 발생하면 catch 블록이 실행되지 않아 deleteAccount() 호출이 누락
+            User savedUser = userRepository.saveAndFlush(user);
+            return savedUser.getUserId();
         } catch (Exception e) {
             // 회원가입 중 실패하면 keycloak_db에서도 삭제
             accountProvider.deleteAccount(keycloakId);
