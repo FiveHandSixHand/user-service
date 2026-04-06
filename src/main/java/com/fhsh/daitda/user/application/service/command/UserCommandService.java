@@ -18,7 +18,7 @@ public class UserCommandService {
     private final UserRepository userRepository;
 
     @Transactional
-    public UUID signup(SignupCommand command) {
+    public void signup(SignupCommand command) {
         // Keycloak 계정 생성 (DB 트랜잭션과 무관한 외부 통신)
         UUID keycloakId = accountProvider.createAccount(
                 command.email(),
@@ -45,7 +45,6 @@ public class UserCommandService {
             // try-catch 블록은 persist 단계까지만 보호하며,
             // 커밋 시 제약조건 위반이나 flush 실패가 발생하면 catch 블록이 실행되지 않아 deleteAccount() 호출이 누락
             User savedUser = userRepository.saveAndFlush(user);
-            return savedUser.getUserId();
         } catch (Exception e) {
             // 회원가입 중 실패하면 keycloak_db에서도 삭제
             accountProvider.deleteAccount(keycloakId);

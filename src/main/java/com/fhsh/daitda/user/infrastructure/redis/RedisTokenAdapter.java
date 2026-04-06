@@ -1,0 +1,62 @@
+package com.fhsh.daitda.user.infrastructure.redis;
+
+import com.fhsh.daitda.user.application.port.TokenPort;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+@Component
+@RequiredArgsConstructor
+public class RedisTokenAdapter implements TokenPort {
+
+    private final RedisTemplate<String, String> redisTemplate;
+    private static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
+    private static final String BLACKLIST_PREFIX = "blacklist:";
+
+    @Override
+    public void saveRefreshToken(UUID userId, String refreshToken, long duration, TimeUnit unit) {
+        String key = REFRESH_TOKEN_PREFIX + userId.toString();
+        redisTemplate.opsForValue().set(key, refreshToken, duration, unit);
+    }
+
+    @Override
+    public void deleteRefreshToken(UUID userId) {
+        String key = REFRESH_TOKEN_PREFIX + userId.toString();
+        redisTemplate.delete(key);
+    }
+
+    @Override
+    public String getRefreshToken(UUID userId) {
+        String key = REFRESH_TOKEN_PREFIX + userId.toString();
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    @Override
+    public void addToBlacklist(String accessToken, long duration, TimeUnit unit) {
+        String key = BLACKLIST_PREFIX + sha256(accessToken);
+        redisTemplate.opsForValue().set(key, "black", duration, unit);
+    }
+
+    @Override
+    public boolean isBlacklisted(String accessToken) {
+        String key = BLACKLIST_PREFIX + sha256(accessToken);
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+    }
+
+    private String sha256(String token) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] digest = md.digest(token.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(digest);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
+    }
+}
