@@ -1,4 +1,4 @@
-package com.fhsh.daitda.common.config;
+package com.fhsh.daitda.user.config;
 
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;

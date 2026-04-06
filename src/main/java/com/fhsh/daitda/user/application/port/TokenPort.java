@@ -7,6 +7,6 @@ public interface TokenPort {
     void saveRefreshToken(UUID userId, String refreshToken, long duration, TimeUnit unit);
     void deleteRefreshToken(UUID userId);
     String getRefreshToken(UUID userId);
-    void addToBlacklist(String accessToken);
-    UUID getUserIdFromToken(String token);
+    void addToBlacklist(String accessToken, long duration, TimeUnit unit);
+    boolean isBlacklisted(String accessToken);
 }

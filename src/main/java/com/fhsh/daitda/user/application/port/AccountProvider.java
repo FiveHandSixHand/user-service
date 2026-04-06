@@ -1,14 +1,13 @@
 package com.fhsh.daitda.user.application.port;
 
+import com.fhsh.daitda.user.application.result.LoginResult;
 import com.fhsh.daitda.user.domain.enums.UserRole;
-import com.fhsh.daitda.user.domain.vo.AuthTokens;
-
 import java.util.UUID;
 
 /**
  * keycloak과의 연동을 위한 인터페이스
  */
-public interface AccountPort {
+public interface AccountProvider {
     /**
      * keycloak에 계정을 생성하고 고유 식별자(UUID)를 반환합니다.
      */
@@ -19,7 +18,5 @@ public interface AccountPort {
      */
     void deleteAccount(UUID accountId);
 
-    AuthTokens authenticate(String email, String password);
-
-    AuthTokens refresh(String refreshToken);
+    LoginResult authenticate(String email, String password);
 }
