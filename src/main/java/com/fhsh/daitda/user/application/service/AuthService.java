@@ -1,7 +1,6 @@
 package com.fhsh.daitda.user.application.service;
 
 import com.fhsh.daitda.exception.BusinessException;
-import com.fhsh.daitda.user.application.command.LoginCommand;
 import com.fhsh.daitda.user.application.port.AccountPort;
 import com.fhsh.daitda.user.application.port.TokenPort;
 import com.fhsh.daitda.user.domain.entity.User;
@@ -24,15 +23,15 @@ public class AuthService {
     private final UserRepository userRepository;
     private final TokenPort tokenPort;
 
-    public AuthTokens login(LoginCommand loginCommand) {
-        User user = userRepository.findByEmail(loginCommand.email())
+    public AuthTokens login(String email, String password) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
         if (user.getStatus() != UserStatus.APPROVED) {
             throw new BusinessException(UserErrorCode.USER_NOT_APPROVED);
         }
 
-        AuthTokens authTokens = accountPort.authenticate(loginCommand.email(), loginCommand.password());
+        AuthTokens authTokens = accountPort.authenticate(email, password);
 
         // Redis에 Refresh Token 저장
         tokenPort.saveRefreshToken(user.getUserId(), authTokens.refreshToken(), 7, TimeUnit.DAYS);

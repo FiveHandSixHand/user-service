@@ -32,6 +32,8 @@ public class UserExternalController {
                 request.companyId()
         );
 
+
+
         return CommonResponse.success();
     }
 }

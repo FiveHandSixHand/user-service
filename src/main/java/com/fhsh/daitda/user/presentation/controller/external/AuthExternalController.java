@@ -1,7 +1,6 @@
 package com.fhsh.daitda.user.presentation.controller.external;
 
 import com.fhsh.daitda.response.CommonResponse;
-import com.fhsh.daitda.user.application.command.LoginCommand;
 import com.fhsh.daitda.user.application.service.AuthService;
 import com.fhsh.daitda.user.domain.vo.AuthTokens;
 import com.fhsh.daitda.user.presentation.dto.request.LoginRequest;
@@ -22,8 +21,7 @@ public class AuthExternalController {
 
     @PostMapping("/login")
     public CommonResponse<LoginResponse> login(@RequestBody LoginRequest request) {
-        LoginCommand command = new LoginCommand(request.email(), request.password());
-        AuthTokens result = authService.login(command);
+        AuthTokens result = authService.login(request.email(), request.password());
         return CommonResponse.success(new LoginResponse(result.accessToken(), result.refreshToken()));
     }
 
