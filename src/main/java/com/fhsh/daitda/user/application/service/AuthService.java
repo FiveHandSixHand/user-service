@@ -1,0 +1,31 @@
+package com.fhsh.daitda.user.application.service;
+
+import com.fhsh.daitda.exception.BusinessException;
+import com.fhsh.daitda.user.application.command.LoginCommand;
+import com.fhsh.daitda.user.application.port.AccountProvider;
+import com.fhsh.daitda.user.application.result.LoginResult;
+import com.fhsh.daitda.user.domain.entity.User;
+import com.fhsh.daitda.user.domain.enums.UserStatus;
+import com.fhsh.daitda.user.domain.exception.UserErrorCode;
+import com.fhsh.daitda.user.domain.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class AuthService {
+
+    private final AccountProvider accountProvider;
+    private final UserRepository userRepository;
+
+    public LoginResult login(LoginCommand loginCommand) {
+        User user = userRepository.findByEmail(loginCommand.email())
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        if (user.getStatus() != UserStatus.APPROVED) {
+            throw new BusinessException(UserErrorCode.USER_NOT_APPROVED);
+        }
+
+        return accountProvider.authenticate(loginCommand.email(), loginCommand.password());
+    }
+}
