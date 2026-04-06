@@ -5,7 +5,9 @@ import com.fhsh.daitda.user.application.command.LoginCommand;
 import com.fhsh.daitda.user.application.result.LoginResult;
 import com.fhsh.daitda.user.application.service.AuthService;
 import com.fhsh.daitda.user.presentation.dto.request.LoginRequest;
+import com.fhsh.daitda.user.presentation.dto.request.TokenReissueRequest;
 import com.fhsh.daitda.user.presentation.dto.response.LoginResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,5 +34,11 @@ public class AuthExternalController {
     ) {
         authService.logout(userId, authHeader);
         return CommonResponse.success();
+    }
+
+    @PostMapping("/reissue")
+    public CommonResponse<LoginResponse> reissue(@Valid @RequestBody TokenReissueRequest request) {
+        LoginResult result = authService.reissue(request.refreshToken());
+        return CommonResponse.success(new LoginResponse(result.accessToken(), result.refreshToken()));
     }
 }
