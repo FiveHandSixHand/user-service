@@ -13,6 +13,7 @@ public enum UserErrorCode implements ErrorCode {
     INVALID_USER_INPUT(HttpStatus.BAD_REQUEST, "잘못된 사용자 입력 값입니다."),
     INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "올바르지 않은 이메일 형식입니다."),
     AUDITOR_INFO_TOO_LONG(HttpStatus.BAD_REQUEST, "수정자 정보가 허용된 길이를 초과했습니다."),
+    INVALID_REFERENCE_ID(HttpStatus.BAD_REQUEST, "참조된 리소스가 유효하지 않습니다."),
 
     // 401 Unauthorized / 403 Forbidden
     USER_NOT_APPROVED(HttpStatus.FORBIDDEN, "승인되지 않은 사용자입니다."),
