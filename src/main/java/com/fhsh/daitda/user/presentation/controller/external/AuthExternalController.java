@@ -7,10 +7,9 @@ import com.fhsh.daitda.user.application.service.AuthService;
 import com.fhsh.daitda.user.presentation.dto.request.LoginRequest;
 import com.fhsh.daitda.user.presentation.dto.response.LoginResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,5 +23,14 @@ public class AuthExternalController {
         LoginCommand command = new LoginCommand(request.email(), request.password());
         LoginResult result = authService.login(command);
         return CommonResponse.success(new LoginResponse(result.accessToken(), result.refreshToken()));
+    }
+
+    @PostMapping("/logout")
+    public CommonResponse<Void> logout(
+            @RequestHeader("X-User-Id") UUID userId,
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        authService.logout(userId, authHeader);
+        return CommonResponse.success();
     }
 }

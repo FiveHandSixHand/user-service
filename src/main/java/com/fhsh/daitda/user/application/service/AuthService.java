@@ -12,6 +12,7 @@ import com.fhsh.daitda.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -33,9 +34,18 @@ public class AuthService {
         LoginResult loginResult = accountProvider.authenticate(loginCommand.email(), loginCommand.password());
 
         // Redis에 Refresh Token 저장
-        // 만료 시간은 예시로 7일 설정 (추후 설정 파일로 분리 가능)
         tokenPort.saveRefreshToken(user.getUserId(), loginResult.refreshToken(), 7, TimeUnit.DAYS);
 
         return loginResult;
+    }
+
+    public void logout(UUID userId, String authHeader) {
+        // 1. Refresh Token 삭제
+        tokenPort.deleteRefreshToken(userId);
+
+        // 2. Access Token 블랙리스트 추가 요청
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            tokenPort.addToBlacklist(authHeader.substring(7));
+        }
     }
 }
