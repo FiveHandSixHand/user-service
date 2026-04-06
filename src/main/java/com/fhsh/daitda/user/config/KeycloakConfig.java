@@ -29,7 +29,7 @@ public class KeycloakConfig {
     public Keycloak keycloak() {
         return KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
-                .realm(realm) // 보통 관리를 위해 master realm을 사용하거나 지정된 realm을 사용
+                .realm("master")
                 .grantType(OAuth2Constants.PASSWORD)
                 .clientId(adminClientId)
                 .username(adminUsername)
