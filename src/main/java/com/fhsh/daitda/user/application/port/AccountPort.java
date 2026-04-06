@@ -18,4 +18,6 @@ public interface AccountPort {
     AuthTokens refresh(String refreshToken);
 
     void updateAccountStatus(UUID accountId, boolean enabled);
+
+    void updateAccountRole(UUID accountId, UserRole newRole);
 }
