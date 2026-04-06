@@ -63,7 +63,7 @@ public class UserExternalController {
     @PatchMapping("/{userId}")
     public CommonResponse<UserUpdateResponse> updateUser(
             @PathVariable("userId") UUID userId,
-            @RequestBody UserUpdateRequest request
+            @Valid @RequestBody UserUpdateRequest request
     ) {
         UserUpdateResponse response = userCommandService.updateUser(new UserUpdateCommand(
                 userId,
