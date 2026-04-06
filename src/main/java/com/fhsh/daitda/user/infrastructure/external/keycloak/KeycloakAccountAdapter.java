@@ -2,9 +2,9 @@ package com.fhsh.daitda.user.infrastructure.external.keycloak;
 
 import com.fhsh.daitda.exception.BusinessException;
 import com.fhsh.daitda.user.application.port.AccountPort;
-import com.fhsh.daitda.user.application.result.LoginResult;
 import com.fhsh.daitda.user.domain.exception.AuthErrorCode;
 import com.fhsh.daitda.user.domain.enums.UserRole;
+import com.fhsh.daitda.user.domain.vo.AuthTokens;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.OAuth2Constants;
@@ -117,7 +117,7 @@ public class KeycloakAccountAdapter implements AccountPort {
     }
 
     @Override
-    public LoginResult authenticate(String email, String password) {
+    public AuthTokens authenticate(String email, String password) {
         try (Keycloak userKeycloak = KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
                 .realm(realm)
@@ -128,14 +128,14 @@ public class KeycloakAccountAdapter implements AccountPort {
                 .build()
         ) {
             AccessTokenResponse response = userKeycloak.tokenManager().getAccessToken();
-            return new LoginResult(response.getToken(), response.getRefreshToken());
+            return new AuthTokens(response.getToken(), response.getRefreshToken());
         } catch (Exception e) {
             throw new BusinessException(AuthErrorCode.INVALID_CREDENTIALS);
         }
     }
 
     @Override
-    public LoginResult refresh(String refreshToken) {
+    public AuthTokens refresh(String refreshToken) {
         try {
             Map<String, String> params = new HashMap<>();
             params.put("grant_type", "refresh_token");
@@ -143,7 +143,7 @@ public class KeycloakAccountAdapter implements AccountPort {
             params.put("refresh_token", refreshToken);
 
             AccessTokenResponse response = authClient.refresh(params);
-            return new LoginResult(response.getToken(), response.getRefreshToken());
+            return new AuthTokens(response.getToken(), response.getRefreshToken());
         } catch (Exception e) {
             throw new BusinessException(AuthErrorCode.TOKEN_EXPIRED);
         }

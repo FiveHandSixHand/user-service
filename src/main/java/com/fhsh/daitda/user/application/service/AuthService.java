@@ -4,12 +4,12 @@ import com.fhsh.daitda.exception.BusinessException;
 import com.fhsh.daitda.user.application.command.LoginCommand;
 import com.fhsh.daitda.user.application.port.AccountPort;
 import com.fhsh.daitda.user.application.port.TokenPort;
-import com.fhsh.daitda.user.application.result.LoginResult;
 import com.fhsh.daitda.user.domain.entity.User;
 import com.fhsh.daitda.user.domain.enums.UserStatus;
 import com.fhsh.daitda.user.domain.exception.AuthErrorCode;
 import com.fhsh.daitda.user.domain.exception.UserErrorCode;
 import com.fhsh.daitda.user.domain.repository.UserRepository;
+import com.fhsh.daitda.user.domain.vo.AuthTokens;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final TokenPort tokenPort;
 
-    public LoginResult login(LoginCommand loginCommand) {
+    public AuthTokens login(LoginCommand loginCommand) {
         User user = userRepository.findByEmail(loginCommand.email())
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
@@ -32,12 +32,12 @@ public class AuthService {
             throw new BusinessException(UserErrorCode.USER_NOT_APPROVED);
         }
 
-        LoginResult loginResult = accountPort.authenticate(loginCommand.email(), loginCommand.password());
+        AuthTokens authTokens = accountPort.authenticate(loginCommand.email(), loginCommand.password());
 
         // Redis에 Refresh Token 저장
-        tokenPort.saveRefreshToken(user.getUserId(), loginResult.refreshToken(), 7, TimeUnit.DAYS);
+        tokenPort.saveRefreshToken(user.getUserId(), authTokens.refreshToken(), 7, TimeUnit.DAYS);
 
-        return loginResult;
+        return authTokens;
     }
 
     public void logout(UUID userId, String authHeader) {
@@ -50,7 +50,7 @@ public class AuthService {
         }
     }
 
-    public LoginResult reissue(String refreshToken) {
+    public AuthTokens reissue(String refreshToken) {
         // 토큰에서 사용자 ID 추출
         UUID userId = tokenPort.getUserIdFromToken(refreshToken);
         if (userId == null) {
@@ -64,11 +64,11 @@ public class AuthService {
         }
 
         // Keycloak을 통해 새로운 토큰 세트 발급
-        LoginResult newResult = accountPort.refresh(refreshToken);
+        AuthTokens tokens = accountPort.refresh(refreshToken);
 
         // Redis 정보 갱신
-        tokenPort.saveRefreshToken(userId, newResult.refreshToken(), 7, TimeUnit.DAYS);
+        tokenPort.saveRefreshToken(userId, tokens.refreshToken(), 7, TimeUnit.DAYS);
 
-        return newResult;
+        return tokens;
     }
 }

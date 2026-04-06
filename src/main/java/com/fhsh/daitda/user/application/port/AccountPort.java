@@ -1,7 +1,8 @@
 package com.fhsh.daitda.user.application.port;
 
-import com.fhsh.daitda.user.application.result.LoginResult;
 import com.fhsh.daitda.user.domain.enums.UserRole;
+import com.fhsh.daitda.user.domain.vo.AuthTokens;
+
 import java.util.UUID;
 
 /**
@@ -18,7 +19,7 @@ public interface AccountPort {
      */
     void deleteAccount(UUID accountId);
 
-    LoginResult authenticate(String email, String password);
+    AuthTokens authenticate(String email, String password);
 
-    LoginResult refresh(String refreshToken);
+    AuthTokens refresh(String refreshToken);
 }

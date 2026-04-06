@@ -2,8 +2,8 @@ package com.fhsh.daitda.user.presentation.controller.external;
 
 import com.fhsh.daitda.response.CommonResponse;
 import com.fhsh.daitda.user.application.command.LoginCommand;
-import com.fhsh.daitda.user.application.result.LoginResult;
 import com.fhsh.daitda.user.application.service.AuthService;
+import com.fhsh.daitda.user.domain.vo.AuthTokens;
 import com.fhsh.daitda.user.presentation.dto.request.LoginRequest;
 import com.fhsh.daitda.user.presentation.dto.request.TokenReissueRequest;
 import com.fhsh.daitda.user.presentation.dto.response.LoginResponse;
@@ -23,7 +23,7 @@ public class AuthExternalController {
     @PostMapping("/login")
     public CommonResponse<LoginResponse> login(@RequestBody LoginRequest request) {
         LoginCommand command = new LoginCommand(request.email(), request.password());
-        LoginResult result = authService.login(command);
+        AuthTokens result = authService.login(command);
         return CommonResponse.success(new LoginResponse(result.accessToken(), result.refreshToken()));
     }
 
@@ -38,7 +38,7 @@ public class AuthExternalController {
 
     @PostMapping("/reissue")
     public CommonResponse<LoginResponse> reissue(@Valid @RequestBody TokenReissueRequest request) {
-        LoginResult result = authService.reissue(request.refreshToken());
+        AuthTokens result = authService.reissue(request.refreshToken());
         return CommonResponse.success(new LoginResponse(result.accessToken(), result.refreshToken()));
     }
 }
