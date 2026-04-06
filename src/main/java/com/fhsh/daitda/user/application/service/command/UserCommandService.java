@@ -3,7 +3,7 @@ package com.fhsh.daitda.user.application.service.command;
 import com.fhsh.daitda.user.application.command.SignupCommand;
 import com.fhsh.daitda.user.domain.entity.User;
 import com.fhsh.daitda.user.domain.repository.UserRepository;
-import com.fhsh.daitda.user.application.port.AccountProvider;
+import com.fhsh.daitda.user.application.port.AccountPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,13 +14,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserCommandService {
 
-    private final AccountProvider accountProvider;
+    private final AccountPort accountPort;
     private final UserRepository userRepository;
 
     @Transactional
     public void signup(SignupCommand command) {
         // Keycloak 계정 생성 (DB 트랜잭션과 무관한 외부 통신)
-        UUID keycloakId = accountProvider.createAccount(
+        UUID keycloakId = accountPort.createAccount(
                 command.email(),
                 command.password(),
                 command.name(),
@@ -47,7 +47,7 @@ public class UserCommandService {
             User savedUser = userRepository.saveAndFlush(user);
         } catch (Exception e) {
             // 회원가입 중 실패하면 keycloak_db에서도 삭제
-            accountProvider.deleteAccount(keycloakId);
+            accountPort.deleteAccount(keycloakId);
             throw e; 
         }
     }
