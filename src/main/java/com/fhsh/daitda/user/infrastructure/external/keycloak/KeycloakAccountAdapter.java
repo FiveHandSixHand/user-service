@@ -148,4 +148,16 @@ public class KeycloakAccountAdapter implements AccountPort {
             throw new BusinessException(AuthErrorCode.TOKEN_EXPIRED);
         }
     }
+
+    @Override
+    public void updateAccountStatus(UUID accountId, boolean enabled) {
+        try {
+            UserResource userResource = keycloak.realm(realm).users().get(accountId.toString());
+            UserRepresentation user = userResource.toRepresentation();
+            user.setEnabled(enabled);
+            userResource.update(user);
+        } catch (Exception e) {
+            throw new BusinessException(AuthErrorCode.AUTH_SERVER_ERROR);
+        }
+    }
 }

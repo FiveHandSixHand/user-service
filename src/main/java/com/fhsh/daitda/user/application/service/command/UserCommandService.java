@@ -1,7 +1,11 @@
 package com.fhsh.daitda.user.application.service.command;
-
+import com.fhsh.daitda.exception.BusinessException;
 import com.fhsh.daitda.user.application.command.SignupCommand;
 import com.fhsh.daitda.user.domain.entity.User;
+import com.fhsh.daitda.user.domain.enums.UserRole;
+import com.fhsh.daitda.user.domain.enums.UserStatus;
+import com.fhsh.daitda.user.domain.exception.AuthErrorCode;
+import com.fhsh.daitda.user.domain.exception.UserErrorCode;
 import com.fhsh.daitda.user.domain.repository.UserRepository;
 import com.fhsh.daitda.user.application.port.AccountPort;
 import lombok.RequiredArgsConstructor;
@@ -50,5 +54,43 @@ public class UserCommandService {
             accountPort.deleteAccount(keycloakId);
             throw e; 
         }
+    }
+
+    @Transactional
+    public void registration(UUID userId, boolean isApproved) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        // 승인/거절 처리 및 Keycloak 동기화
+        if (isApproved) {
+            user.approve();
+            accountPort.updateAccountStatus(user.getUserId(), true);
+        } else {
+            user.reject();
+            // 거절 시에는 Keycloak 계정을 비활성화 상태로 유지
+            accountPort.updateAccountStatus(user.getUserId(), false);
+        }
+
+        userRepository.save(user);
+    }
+
+
+    @Transactional
+    public void deleteUser(UUID targetUserId, UUID deletedBy) {
+        // 1. 대상 사용자 조회
+        User user = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        // 이미 삭제된 상태인지 확인
+        if (user.getStatus() == UserStatus.DELETED) {
+            throw new BusinessException(UserErrorCode.ALREADY_DELETED);
+        }
+
+        // DB Soft Delete 수행
+        user.delete(deletedBy);
+        userRepository.save(user);
+
+        // Keycloak 계정 삭제
+        accountPort.deleteAccount(targetUserId);
     }
 }
