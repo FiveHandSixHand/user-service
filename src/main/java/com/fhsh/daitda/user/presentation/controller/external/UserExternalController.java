@@ -5,6 +5,7 @@ import com.fhsh.daitda.response.CommonResponse;
 import com.fhsh.daitda.user.application.command.SignupCommand;
 import com.fhsh.daitda.user.application.command.UserRoleUpdateCommand;
 import com.fhsh.daitda.user.application.command.UserUpdateCommand;
+import com.fhsh.daitda.user.application.result.UserUpdateResult;
 import com.fhsh.daitda.user.application.service.command.UserCommandService;
 import com.fhsh.daitda.user.presentation.dto.request.UserRegistrationRequest;
 import com.fhsh.daitda.user.presentation.dto.request.UserRoleUpdateRequest;
@@ -65,14 +66,14 @@ public class UserExternalController {
             @PathVariable("userId") UUID userId,
             @Valid @RequestBody UserUpdateRequest request
     ) {
-        UserUpdateResponse response = userCommandService.updateUser(new UserUpdateCommand(
+        UserUpdateResult result = userCommandService.updateUser(new UserUpdateCommand(
                 userId,
                 request.name(),
                 request.slackUserId(),
                 request.hubId(),
                 request.companyId()
         ));
-        return CommonResponse.success("사용자 정보 수정 성공", response);
+        return CommonResponse.success("사용자 정보 수정 성공", UserUpdateResponse.from(result));
     }
 
     @HasRole("ADMIN")
