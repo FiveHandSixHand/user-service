@@ -7,8 +7,7 @@ spring:
   cloud:
     config:
       discovery:
-        enabled: true
-        service-id: config-server
+        enabled: false
 
   config:
-    import: "configserver:"
+    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
