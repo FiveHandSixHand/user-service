@@ -3,6 +3,7 @@ package com.fhsh.daitda.user.presentation.dto.response;
 import com.fhsh.daitda.user.application.result.UserQueryResult;
 import com.fhsh.daitda.user.domain.enums.UserRole;
 import com.fhsh.daitda.user.domain.enums.UserStatus;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record UserResponse(
@@ -13,7 +14,8 @@ public record UserResponse(
         UserStatus status,
         String slackUserId,
         UUID hubId,
-        UUID companyId
+        UUID companyId,
+        LocalDateTime createdAt
 ) {
     public static UserResponse from(UserQueryResult result) {
         return new UserResponse(
@@ -24,7 +26,8 @@ public record UserResponse(
                 result.status(),
                 result.slackUserId(),
                 result.hubId(),
-                result.companyId()
+                result.companyId(),
+                result.createdAt()
         );
     }
 }
