@@ -20,10 +20,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -156,6 +154,39 @@ public class KeycloakAccountAdapter implements AccountPort {
             UserRepresentation user = userResource.toRepresentation();
             user.setEnabled(enabled);
             userResource.update(user);
+        } catch (Exception e) {
+            throw new BusinessException(AuthErrorCode.AUTH_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public void updateAccountRole(UUID accountId, UserRole newRole) {
+        try {
+            UserResource userResource = keycloak.realm(realm).users().get(accountId.toString());
+
+            // 현재 사용자에게 부여된 렐름 레벨 권한 목록 조회
+            List<RoleRepresentation> currentRoles = userResource.roles().realmLevel().listAll();
+
+            // 우리 애플리케이션에서 사용하는 권한(UserRole enum에 정의된 것들) 필터링
+            Set<String> appRoleNames = Arrays.stream(UserRole.values())
+                    .map(Enum::name)
+                    .collect(Collectors.toSet());
+
+            // 변경하려는 대상 권한을 이미 가지고 있는지 확인
+            boolean alreadyHasTargetRole = currentRoles.stream()
+                    .anyMatch(role -> newRole.name().equals(role.getName()));
+            if (!alreadyHasTargetRole) {
+                assignRoleToUser(accountId.toString(), newRole.name());
+            }
+
+            List<RoleRepresentation> rolesToRemove = currentRoles.stream()
+                    .filter(role -> appRoleNames.contains(role.getName()))
+                    .filter(role -> !newRole.name().equals(role.getName()))
+                    .toList();
+            if (!rolesToRemove.isEmpty()) {
+                userResource.roles().realmLevel().remove(rolesToRemove);
+            }
+
         } catch (Exception e) {
             throw new BusinessException(AuthErrorCode.AUTH_SERVER_ERROR);
         }

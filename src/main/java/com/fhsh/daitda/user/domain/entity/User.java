@@ -102,6 +102,29 @@ public class User extends BaseUserEntity {
         this.approve();
     }
 
+    public void update(String name, String slackUserId, UUID hubId, UUID companyId) {
+        if (name != null) {
+            validateName(name);
+            this.name = name;
+        }
+        if (slackUserId != null) {
+            this.slackUserId = slackUserId;
+        }
+        if (hubId != null) {
+            this.hubId = hubId;
+        }
+        if (companyId != null) {
+            this.companyId = companyId;
+        }
+    }
+
+    public void updateRole(UserRole role) {
+        if (role == null) {
+            throw new BusinessException(UserErrorCode.INVALID_USER_INPUT, "권한은 필수 입력 값입니다.");
+        }
+        this.role = role;
+    }
+
     private void validateEmail(String email) {
         if (!StringUtils.hasText(email) || !email.contains("@")) {
             throw new BusinessException(UserErrorCode.INVALID_EMAIL_FORMAT);

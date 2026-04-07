@@ -1,13 +1,16 @@
 package com.fhsh.daitda.user.application.service.command;
 import com.fhsh.daitda.exception.BusinessException;
 import com.fhsh.daitda.user.application.command.SignupCommand;
+import com.fhsh.daitda.user.application.command.UserRoleUpdateCommand;
+import com.fhsh.daitda.user.application.command.UserUpdateCommand;
+import com.fhsh.daitda.user.application.result.UserUpdateResult;
 import com.fhsh.daitda.user.domain.entity.User;
-import com.fhsh.daitda.user.domain.enums.UserRole;
 import com.fhsh.daitda.user.domain.enums.UserStatus;
-import com.fhsh.daitda.user.domain.exception.AuthErrorCode;
 import com.fhsh.daitda.user.domain.exception.UserErrorCode;
 import com.fhsh.daitda.user.domain.repository.UserRepository;
 import com.fhsh.daitda.user.application.port.AccountPort;
+import com.fhsh.daitda.user.infrastructure.external.feign.CompanyClient;
+import com.fhsh.daitda.user.infrastructure.external.feign.HubClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +23,14 @@ public class UserCommandService {
 
     private final AccountPort accountPort;
     private final UserRepository userRepository;
+    private final HubClient hubClient;
+    private final CompanyClient companyClient;
 
     @Transactional
     public void signup(SignupCommand command) {
+        // 허브 및 업체 존재 여부 검증
+        validateHubAndCompany(command.hubId(), command.companyId());
+
         // Keycloak 계정 생성 (DB 트랜잭션과 무관한 외부 통신)
         UUID keycloakId = accountPort.createAccount(
                 command.email(),
@@ -92,5 +100,64 @@ public class UserCommandService {
 
         // Keycloak 계정 삭제
         accountPort.deleteAccount(targetUserId);
+    }
+
+    @Transactional
+    public UserUpdateResult updateUser(UserUpdateCommand command) {
+        User user = userRepository.findById(command.userId())
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        if (user.getStatus() == UserStatus.DELETED) {
+            throw new BusinessException(UserErrorCode.ALREADY_DELETED);
+        }
+
+        // 허브 및 업체 존재 여부 검증
+        validateHubAndCompany(command.hubId(), command.companyId());
+
+        user.update(command.name(), command.slackUserId(), command.hubId(), command.companyId());
+        User updatedUser = userRepository.saveAndFlush(user);
+
+        return new UserUpdateResult(
+                updatedUser.getUserId(),
+                updatedUser.getName(),
+                updatedUser.getSlackUserId(),
+                updatedUser.getHubId(),
+                updatedUser.getCompanyId(),
+                updatedUser.getUpdatedAt()
+        );
+    }
+
+    @Transactional
+    public void updateUserRole(UserRoleUpdateCommand command) {
+        User user = userRepository.findById(command.userId())
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        if (user.getStatus() == UserStatus.DELETED) {
+            throw new BusinessException(UserErrorCode.ALREADY_DELETED);
+        }
+
+        // 로컬 DB 권한 변경
+        user.updateRole(command.role());
+        userRepository.saveAndFlush(user);
+
+        // Keycloak 권한 변경
+        accountPort.updateAccountRole(user.getUserId(), command.role());
+    }
+
+    private void validateHubAndCompany(UUID hubId, UUID companyId) {
+        if (hubId != null) {
+            try {
+                hubClient.getHubById(hubId);
+            } catch (Exception e) {
+                throw new BusinessException(UserErrorCode.INVALID_REFERENCE_ID);
+            }
+        }
+        if (companyId != null) {
+            try {
+                companyClient.getCompanyById(companyId);
+            } catch (Exception e) {
+                throw new BusinessException(UserErrorCode.INVALID_REFERENCE_ID);
+            }
+        }
     }
 }
