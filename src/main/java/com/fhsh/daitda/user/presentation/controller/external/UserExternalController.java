@@ -5,12 +5,15 @@ import com.fhsh.daitda.response.CommonResponse;
 import com.fhsh.daitda.user.application.command.SignupCommand;
 import com.fhsh.daitda.user.application.command.UserRoleUpdateCommand;
 import com.fhsh.daitda.user.application.command.UserUpdateCommand;
+import com.fhsh.daitda.user.application.result.UserQueryResult;
 import com.fhsh.daitda.user.application.result.UserUpdateResult;
 import com.fhsh.daitda.user.application.service.command.UserCommandService;
+import com.fhsh.daitda.user.application.service.query.UserQueryService;
 import com.fhsh.daitda.user.presentation.dto.request.UserRegistrationRequest;
 import com.fhsh.daitda.user.presentation.dto.request.UserRoleUpdateRequest;
 import com.fhsh.daitda.user.presentation.dto.request.UserSignupRequest;
 import com.fhsh.daitda.user.presentation.dto.request.UserUpdateRequest;
+import com.fhsh.daitda.user.presentation.dto.response.UserResponse;
 import com.fhsh.daitda.user.presentation.dto.response.UserUpdateResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ import java.util.UUID;
 public class UserExternalController {
 
     private final UserCommandService userCommandService;
+    private final UserQueryService userQueryService;
 
     @PostMapping("/signup")
     public CommonResponse<Void> signup(@Valid @RequestBody UserSignupRequest request) {
@@ -84,5 +88,11 @@ public class UserExternalController {
     ) {
         userCommandService.updateUserRole(new UserRoleUpdateCommand(userId, request.role()));
         return CommonResponse.success("사용자 권한 변경 성공", null);
+    }
+
+    @GetMapping("/me")
+    public CommonResponse<UserResponse> getMyInfo(@RequestHeader("X-User-Id") UUID userId) {
+        UserQueryResult result = userQueryService.getUserById(userId);
+        return CommonResponse.success("내 정보 조회 성공", UserResponse.from(result));
     }
 }
