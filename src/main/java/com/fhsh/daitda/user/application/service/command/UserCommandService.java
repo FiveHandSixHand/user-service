@@ -132,6 +132,10 @@ public class UserCommandService {
         User user = userRepository.findById(command.userId())
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
+        if (user.getStatus() == UserStatus.DELETED) {
+            throw new BusinessException(UserErrorCode.ALREADY_DELETED);
+        }
+
         // 로컬 DB 권한 변경
         user.updateRole(command.role());
         userRepository.saveAndFlush(user);
