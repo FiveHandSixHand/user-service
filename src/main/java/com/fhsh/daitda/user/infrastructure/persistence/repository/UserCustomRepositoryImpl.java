@@ -1,6 +1,6 @@
 package com.fhsh.daitda.user.infrastructure.persistence.repository;
 
-import com.fhsh.daitda.user.application.command.UserSearchCriteria;
+import com.fhsh.daitda.user.application.command.UserSearchCommand;
 import com.fhsh.daitda.user.domain.entity.QUser;
 import com.fhsh.daitda.user.domain.entity.User;
 import com.fhsh.daitda.user.domain.repository.UserCustomRepository;
@@ -27,7 +27,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
     protected final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<User> findAll(UserSearchCriteria criteria, Pageable pageable) {
+    public Page<User> findAll(UserSearchCommand criteria, Pageable pageable) {
         QUser user = QUser.user;
 
         BooleanBuilder builder = new BooleanBuilder();
