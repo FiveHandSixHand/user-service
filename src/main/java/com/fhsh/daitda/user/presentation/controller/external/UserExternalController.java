@@ -19,6 +19,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
@@ -111,7 +112,7 @@ public class UserExternalController {
     @GetMapping
     public CommonResponse<Page<UserResponse>> getUsers(
             @ModelAttribute UserSearchRequest request,
-            @PageableDefault(size = 10) Pageable pageable
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         UserSearchCommand command = new UserSearchCommand(
                 request.email(),
