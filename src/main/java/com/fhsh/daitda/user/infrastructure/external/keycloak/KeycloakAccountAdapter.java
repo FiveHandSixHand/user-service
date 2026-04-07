@@ -172,17 +172,20 @@ public class KeycloakAccountAdapter implements AccountPort {
                     .map(Enum::name)
                     .collect(Collectors.toSet());
 
+            // 변경하려는 대상 권한을 이미 가지고 있는지 확인
+            boolean alreadyHasTargetRole = currentRoles.stream()
+                    .anyMatch(role -> newRole.name().equals(role.getName()));
+            if (!alreadyHasTargetRole) {
+                assignRoleToUser(accountId.toString(), newRole.name());
+            }
+
             List<RoleRepresentation> rolesToRemove = currentRoles.stream()
                     .filter(role -> appRoleNames.contains(role.getName()))
+                    .filter(role -> !newRole.name().equals(role.getName()))
                     .toList();
-
-            // 기존 애플리케이션 권한 삭제
             if (!rolesToRemove.isEmpty()) {
                 userResource.roles().realmLevel().remove(rolesToRemove);
             }
-
-            // 새로운 권한 부여
-            assignRoleToUser(accountId.toString(), newRole.name());
 
         } catch (Exception e) {
             throw new BusinessException(AuthErrorCode.AUTH_SERVER_ERROR);
