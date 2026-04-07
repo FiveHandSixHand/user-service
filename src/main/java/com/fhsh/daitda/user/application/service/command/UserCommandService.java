@@ -132,12 +132,12 @@ public class UserCommandService {
         User user = userRepository.findById(command.userId())
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        // Keycloak 권한 변경
-        accountPort.updateAccountRole(user.getUserId(), command.role());
-
         // 로컬 DB 권한 변경
         user.updateRole(command.role());
-        userRepository.save(user);
+        userRepository.saveAndFlush(user);
+
+        // Keycloak 권한 변경
+        accountPort.updateAccountRole(user.getUserId(), command.role());
     }
 
     private void validateHubAndCompany(UUID hubId, UUID companyId) {
