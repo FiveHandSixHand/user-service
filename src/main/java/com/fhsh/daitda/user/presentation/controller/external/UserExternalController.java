@@ -95,4 +95,11 @@ public class UserExternalController {
         UserQueryResult result = userQueryService.getUserById(userId);
         return CommonResponse.success("내 정보 조회 성공", UserResponse.from(result));
     }
+
+    @HasRole("ADMIN")
+    @GetMapping("/{userId}")
+    public CommonResponse<UserResponse> getUserById(@PathVariable("userId") UUID userId) {
+        UserQueryResult result = userQueryService.getUserById(userId);
+        return CommonResponse.success("사용자 상세 조회 성공", UserResponse.from(result));
+    }
 }
